@@ -1,111 +1,66 @@
 "use client"
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
 import { usedata, useframe } from "@/lib/store";
-import { joinWords } from "@/lib/joinwords";
-import { time, words } from "@/lib/constants";
-import EditableCard from "../EditableCard";
+import MyComp from "@/remotion/Composition";
+import { Player } from "@remotion/player";
+import { useState, useEffect, useRef } from "react";
 
-const times = time();
-const numOfWords = words();
+const PlayerRight = () => {
+    const data = usedata((state) => state.data)
+    const frame = useframe((state) => state.frame)
+    const [showReady, setShowReady] = useState(false);
+    const prevDataRef = useRef();
 
-const DescribeLeftOne = () => {
-  const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState("Make a video about....");
-  const updateData = usedata((state) => state.updateData)
-  const updateFrame = useframe((state) => state.updateFrame)
-  const data = usedata((state) => state.data)
-
-  const calculateDuration = (textList) => {
-    const totalSeconds = textList.reduce((acc, _, i) => acc + (times[i] || 0), 0);
-    updateFrame(Math.floor(totalSeconds * 60));
-  };
-  
-
-  const handleChange = (e) => setValue(e.target.value);
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formData: value }),
-      });
-      if (!response.ok) throw new Error("Network response was not ok");
-
-      const dataFromAPI = await response.json();
-      const textList = joinWords(numOfWords, dataFromAPI);
-      calculateDuration(textList);
-      updateData(textList);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
+    const isInitialData = (data) => {
+        return data.length === 39 && 
+               data[0].text === "Embrace the lush" &&
+               data[data.length - 1].text === "our responsibility";
     }
-  };
-  return (
-    <div className="flex flex-col w-full ">
-      <fieldset className="grid gap-4 rounded-lg border p-4">
-        <legend className="-ml-1 px-1 text-sm font-medium">Describe</legend>
-        <div className="grid gap-3">
-          <Label htmlFor="role">Templates</Label>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a Template" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="system">
-                Make a Video About Environment
-              </SelectItem>
-              <SelectItem value="user">
-                Make a Video about RCB wining the match
-              </SelectItem>
-              <SelectItem value="assistant">Other(Describe Below)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="grid gap-3">
-          <Label htmlFor="content">Content</Label>
-          <Textarea
-            id="name"
-            value={value}
-            onChange={handleChange}
-            placeholder="Make a video about..."
-          />
-        </div>
-        <div>
-          <Button
-            onClick={handleSubmit}
-            className="bg-blue-600 m-2 hover:bg-blue-500"
-          >
-            {loading ? "Loading..." : "Generate"}
-          </Button>
-        </div>
-      </fieldset>
-      <div className="w-full h-full">
-        <EditableCard/>
-      </div>
-    </div>
-  );
-};
 
-export default DescribeLeftOne;
+    useEffect(() => {
+        if (data.length > 0 && !isInitialData(data) && JSON.stringify(data) !== JSON.stringify(prevDataRef.current)) {
+            setShowReady(true);
+            const timer = setTimeout(() => {
+                setShowReady(false);
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+        prevDataRef.current = data;
+    }, [data]);
+
+    if (showReady) {
+        return (
+            <div className="w-full h-full flex items-center justify-center">
+                <div className="text-2xl font-bold text-blue-600">
+                    Video Ready to Play
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center p-3 md:p-10">
+            <div className="w-full relative h-44 md:h-full">
+                <Player
+                    className="border-slate-300 bg-white rounded-lg border"
+                    component={MyComp}
+                    inputProps={{ textList: data }}
+                    durationInFrames={frame}
+                    compositionWidth={1920}
+                    compositionHeight={1080}
+                    fps={60}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%'
+                    }}
+                    controls
+                />
+            </div>
+            <div className="w-full mt-2 text-slate-500 text-sm text-center">Frame 4/60</div>
+        </div>
+    )
+}
+
+export default PlayerRight
