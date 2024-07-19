@@ -2,7 +2,7 @@ import React from 'react'
 
 const DescribeLeftFour = () => {
   return (
-    <div>DescribeLeftFour</div>
+    <div>work in progress</div>
   )
 }
 

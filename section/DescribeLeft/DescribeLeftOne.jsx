@@ -14,7 +14,7 @@ const numOfWords = words();
 
 const DescribeLeftOne = () => {
   const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState("Make a video about....");
+  const [value, setValue] = useState("");
   const updateData = usedata(state => state.updateData);
   const updateFrame = useframe(state => state.updateFrame);
 
