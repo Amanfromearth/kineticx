@@ -27,7 +27,7 @@ export async function POST(req) {
       messages: [
         {
           role: "system",
-          content: `Create a kinetic typography video script about ${formData}. Provide a creative text entry of exactly 60 words, including emojis. The output should be in this exact format:
+          content: `Create a kinetic typography video script about ${formData}. Provide a creative text entry around 60+ words, including emojis. The output should be in this exact format:
 [{"text":"Your 60-word script here, including emojis"}]
 Ensure the content is engaging, visually descriptive, and suitable for kinetic typography. Include a mix of impactful statements and a conclusive ending.`,
         },
