@@ -4,19 +4,19 @@ import { usecolor } from "@/lib/store";
 import React from "react";
 
 const colorList = [
-  { text: "White", value: "1", bg: "#f9f9f9", color: "#000000" },
-  { text: "Green", value: "2", bg: "#9DDE8B", color: "#006769" },
+  { text: "Standerd", value: "1", bg: "#f9f9f9", color: "#000000" },
+  { text: "Nature", value: "2", bg: "#9DDE8B", color: "#006769" },
   { text: "Blue", value: "3", bg: "#DBE2EF", color: "#3F72AF" },
   { text: "Red", value: "4", bg: "#F67280", color: "#355C7D" },
-  { text: "Purple", value: "5", bg: "#DCD6F7", color: "#424874" },
+  { text: "Lavender", value: "5", bg: "#DCD6F7", color: "#424874" },
 ];
 
 const DescribeLeftTwo = () => {
-  const color = usecolor(state => state.color); // Fetch current color
-  const updatecolor = usecolor(state => state.updatecolor); // Function to update color
+  const color = usecolor(state => state.color); 
+  const updatecolor = usecolor(state => state.updatecolor);
 
   const handleValueChange = (newValue) => {
-    updatecolor(newValue); // Update color using the new value
+    updatecolor(newValue);
   };
 
   return (
